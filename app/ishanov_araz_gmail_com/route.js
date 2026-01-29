@@ -3,16 +3,23 @@ function gcd(a, b) {
   return a;
 }
 
-export async function GET(request) {
+export function GET(request) {
   const { searchParams } = new URL(request.url);
-  const x = Number(searchParams.get("x"));
-  const y = Number(searchParams.get("y"));
+  const xStr = searchParams.get("x");
+  const yStr = searchParams.get("y");
 
-  if (!Number.isInteger(x) || !Number.isInteger(y) || x <= 0 || y <= 0) {
-    return new Response("NaN", { status: 200 });
+ 
+  if (!/^[1-9]\d*$/.test(xStr ?? "") || !/^[1-9]\d*$/.test(yStr ?? "")) {
+    return new Response("NaN");
   }
 
-  const result = (x * y) / gcd(x, y);
-  return new Response(String(result), { status: 200 });
+  const x = BigInt(xStr);
+  const y = BigInt(yStr);
+
+  let a = x, b = y;
+  while (b !== 0n) [a, b] = [b, a % b];
+  const lcm = (x / a) * y; 
+
+  return new Response(lcm.toString());
 }
 
